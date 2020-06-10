@@ -14,34 +14,33 @@ def Berechnung(x,y):
     return x,y-0.1
 
 #def Phasenportrait():
-fig = plot.figure()
-axs = fig.add_subplot(111)
-
 xstartwerte= []
 ystartwerte = []
-for s in np.arange(0.1,1.05,0.1):
-    xstartwerte.append(1-s)
-    ystartwerte.append(s)     
-axs.plot(xstartwerte,ystartwerte ,color = 'b')
+for s in np.arange(0.0,1.05,0.1):
+    xstartwerte.append(1-s) # Anfällige
+    ystartwerte.append(s)   # Infektiös 
+plot.plot(xstartwerte,ystartwerte ,color = 'b')
 for i in range(len(xstartwerte)):
-    x= []
-    y= []
-    xw=xstartwerte[i]
+    x= np.array([])
+    y= np.array([])
+    xw=xstartwerte[i] 
     yw=ystartwerte[i]
-    while yw>-0.000001:
-        x.append(xw)
-        y.append(yw)
-        print("lol")
-        xw,yw = Berechnung(xw,yw)
-    line = Line2D(x,y)
-    methods.AddArrow(line, position=0.1, direction='right', size=2, color=None)
-    axs.add_line(line) 
+    while yw>0.000001:
+        x = np.append(x,[xw])
+        y = np.append(y,[yw])
+        xw,yw = methods.epidlös(3,xw,yw)
+    
+    plot.plot(x,y,'b--')
+    if(len(x) != 0 and len(y) != 0):
+        line = plot.plot(x,y,'b--')[0]
+        methods.AddArrow(line, position = 0.05, color='b')
     
 plot.ylim(0, 1)
 plot.xlim(0, 1)
+plot.title("Phasenportrait des SIR Modells")
 plot.xlabel("Anteil Anfällige s")
-plot.ylabel("Anteil Anfällige I")
+plot.ylabel("Anteil Infektiöse i")
 plot.show
-    #return True
 
 #Phasenportrait()
+

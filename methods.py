@@ -8,7 +8,55 @@ Created on Mon Jun  8 15:33:03 2020
 import numpy as np
 import math
 
+def SirLesen():
+    '''
+    Dieser Funktion gibt das aus der Datei "sir.param" gelesen Tupel zurück
+    -------
+    gamma : FLOAT
+        Erster Wert in [0]
+    beta0 : FLOAT
+        Zweiter Wert in [1]
+    T : FLOAT
+        Dritter Wert in [2]
+    s0 : FLOAT
+        Vierter Wert in [3]
+    i0 : FLOAT
+        Fünfter Wert in [4]
+        '''
+        
+    file=open("sir.param","r")
+    data=[]
+    for i in file:
+        #einzelne Parameter werden getrennt und in Liste gespeichert
+        data+=i.split() 
+    gamma=float(data[0])
+    beta0=float(data[1])
+    T=float(data[2])
+    s0=float(data[3])
+    i0=float(data[4])
+    file.close()
+    return gamma,beta0,T,s0,i0
 
+gamma,beta0,T,s0,i0 = SirLesen()
+def ableitung(t,y):
+    '''
+    berechnet einen Vektor der Änderunsraten von s und i
+
+    Parameters
+    ----------
+    t : float, Zeitpunkt an dem die Ableitung berechnet wird
+    y : array, y[1] Anzahl Anfälliger s(t)\n
+    y[2] Anzahl Infizierter i(t)
+
+    Returns
+    -------
+    Array, enthält Änderungsrate Anfälliger s und \n
+    Änderungsrate Infizierter i
+
+    '''
+    dS=(-1)*beta0*y[0]*y[1] #Ableitungsfunktion von s(t)
+    dI=beta0*y[0]*y[1]-gamma*y[1] #Ableitungsfunktiono von i(t)
+    return np.array([dS,dI])
 
 def ForwardEuler(fun, y0, T,n):
     '''Forward Euler nimmt als Parameter: \n
@@ -46,36 +94,8 @@ def ForwardKutta4(fun, y0, T, n):
         Schritt = Schritt +  T/n*(1/6 * g1+ 1/3 * g2 + 1/3 * g3 + 1/6 *g4)
     return Schritt
 
-def SirLesen():
-    '''
-    Dieser Funktion gibt das aus der Datei "sir.param" gelesen Tupel zurück
-    -------
-    gamma : FLOAT
-        Erster Wert in [0]
-    beta0 : FLOAT
-        Zweiter Wert in [1]
-    T : FLOAT
-        Dritter Wert in [2]
-    s0 : FLOAT
-        Vierter Wert in [3]
-    i0 : FLOAT
-        Fünfter Wert in [4]
-        '''
-        
-    file=open("sir.param","r")
-    data=[]
-    for i in file:
-        #einzelne Parameter werden getrennt und in Liste gespeichert
-        data+=i.split() 
-    gamma=float(data[0])
-    beta0=float(data[1])
-    T=float(data[2])
-    s0=float(data[3])
-    i0=float(data[4])
-    file.close()
-    return gamma,beta0,T,s0,i0
 
-gamma,beta0,T,s0,i0 = SirLesen()
+
 
 def SirDynLesen():
     '''
@@ -109,28 +129,8 @@ def SirDynLesen():
     file.close()
     return gamma, beta0, my, T, s0,i0
 
-def ableitung(t,y):
-    """
-    berechnet einen Vektor der Änderunsraten von s und i
-
-    Parameters
-    ----------
-    t : float, Zeitpunkt an dem die Ableitung berechnet wird
-    y : array, y[1] Anzahl Anfälliger s(t)\n
-    y[2] Anzahl Infizierter i(t)
-
-    Returns
-    -------
-    Array, enthält Änderungsrate Anfälliger s und \n
-    Änderungsrate Infizierter i
-
-    """
-    dS=(-1)*beta0*y[0]*y[1] #Ableitungsfunktion von s(t)
-    dI=beta0*y[0]*y[1]-gamma*y[1] #Ableitungsfunktiono von i(t)
-    return np.array([dS,dI])
-
 def epidlös(t,s_0,i_0):
-    """
+    '''
     Lösung des epidemischen Modells unter Benutzung von Euler \n
     Funktion der Anfälligen s(t) \n
     und Infizierten i(t) 
@@ -146,12 +146,51 @@ def epidlös(t,s_0,i_0):
     array, enthält normierte Anzahl Anfällige s(t) \n
     und Infizierte i(t)
 
-    """
+    '''
     y_0=np.array([s_0,i_0])
     if t==0:
         return y_0
     else:
-        return ForwardEuler(ableitung,y_0,t,1000)
+        return ForwardEuler(ableitung,y_0,t,2000)
     #n gross wählen!!!
+    
+"""
+Created on Thu Jun  4 06:30:03 2020
 
+@author: Lena
+"""
+
+def AddArrow(line, position=None, direction='right', size=15, color=None):
+    '''
+    Add an arrow to a line.
+
+    line:       Line2D object
+    position:   y-position of the arrow. If None, mean of ydata is taken
+    direction:  'left' or 'right'
+    size:       size of the arrow in fontsize points
+    color:      if None, line color is taken.
+    '''
+    if color is None:
+        color = line.get_color()
+
+    xdata = line.get_xdata()
+    ydata = line.get_ydata()
+
+    if position is None:
+        position = ydata.mean()
+        
+    # find closest index
+    start_ind = np.argmin(np.abs(ydata - position))
+    
+    if direction == 'right':
+        end_ind = start_ind + 1
+    else:
+        end_ind = start_ind - 1
+
+    line.axes.annotate('',
+        xytext=(xdata[start_ind], ydata[start_ind]),
+        xy=(xdata[end_ind], ydata[end_ind]),
+        arrowprops=dict(arrowstyle="->", color=color),
+        size=size
+    )
 
