@@ -19,7 +19,7 @@ axs = fig.add_subplot(111)
 
 xstartwerte= []
 ystartwerte = []
-for s in np.arange(0,1.05,0.1):
+for s in np.arange(0.1,1.05,0.1):
     xstartwerte.append(1-s)
     ystartwerte.append(s)     
 axs.plot(xstartwerte,ystartwerte ,color = 'b')
@@ -31,6 +31,7 @@ for i in range(len(xstartwerte)):
     while yw>-0.000001:
         x.append(xw)
         y.append(yw)
+        print("lol")
         xw,yw = Berechnung(xw,yw)
     line = Line2D(x,y)
     methods.AddArrow(line, position=0.1, direction='right', size=2, color=None)

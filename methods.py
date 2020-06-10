@@ -6,7 +6,7 @@ Created on Mon Jun  8 15:33:03 2020
 @author: Louisa Weber, Bernhard Eisvogel
 """
 import numpy as np
-
+import math
 
 def ForwardEuler(fun, y0, T,n):
     '''Forward Euler nimmt als Parameter: \n
@@ -102,46 +102,6 @@ def SirDynLesen():
         data[j]=float(data[j])
         
     #Bezeichnung der Parameter
-    gamma, beta0,my,T, s0,i0 =data[0],data[1],data[2],data[3],data[4],data[5]
+    gamma, beta0, my, T, s0,i0 =data[0],data[1],data[2],data[3],data[4],data[5]
     file.close()
     return gamma, beta0, my, T, s0,i0
-
-"""
-Created on Thu Jun  4 06:30:03 2020
-
-@author: Lena
-"""
-
-def AddArrow(line, position=None, direction='right', size=15, color=None):
-    '''
-    Add an arrow to a line.
-
-    line:       Line2D object
-    position:   y-position of the arrow. If None, mean of ydata is taken
-    direction:  'left' or 'right'
-    size:       size of the arrow in fontsize points
-    color:      if None, line color is taken.
-    '''
-    if color is None:
-        color = line.get_color()
-
-    xdata = line.get_xdata()
-    ydata = line.get_ydata()
-
-    if position is None:
-        position = ydata.mean()
-        
-    # find closest index
-    start_ind = np.argmin(np.abs(ydata - position))
-    
-    if direction == 'right':
-        end_ind = start_ind + 1
-    else:
-        end_ind = start_ind - 1
-
-    line.axes.annotate('',
-        xytext=(xdata[start_ind], ydata[start_ind]),
-        xy=(xdata[end_ind], ydata[end_ind]),
-        arrowprops=dict(arrowstyle="->", color=color),
-        size=size
-    )
