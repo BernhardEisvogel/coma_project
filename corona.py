@@ -10,6 +10,22 @@ import numpy as np ## nump schon in Folgen importiert
 import matplotlib.pyplot as plot
 from matplotlib.lines import Line2D 
 
+def EpVerlauf():
+    gamma,beta0,T,s0,i0 = methods.SirLesen()
+    t=[]
+    s=[]
+    i=[]
+    for r in np.arange(0,T+0.1,0.1):
+        t.append(r)
+        s.append(methods.epidlös(gamma,beta0, r,s0,i0,0)[0])
+        i.append(methods.epidlös(gamma,beta0, r,s0,i0,0)[1])
+    plot.plot(t,s)
+    plot.plot(t,i)
+    plot.title("Zeitlicher Verlauf der Anfälligen und Infizierten")
+    plot.xlabel("Zeit t")
+    plot.ylabel("Anteil der Anfälligen und Infizierten")
+    plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
+    plot.show()
 
 def Phasenportrait():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
@@ -45,7 +61,8 @@ def Phasenportrait():
 
 gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
 #my = 0.00003
-print("Infizierte in D nach", T, " Tagen: ", methods.endlös(my,gamma, beta0, T,s0,i0,0) )
-print("Infizierte in D nach", T, " Tagen: ", methods.epidlös(gamma, beta0, T,s0,i0,0) )
-
+#print("Infizierte in D nach", T, " Tagen: ", methods.endlös(my,gamma, beta0, T,s0,i0,0) )
+#print("Infizierte in D nach", T, " Tagen: ", methods.epidlös(gamma, beta0, T,s0,i0,0) )
+print(EpVerlauf())
+#print(Phasenportrait())
 
