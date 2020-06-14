@@ -33,13 +33,13 @@ def DatenSir():
     N=83*(10**6)
     t=np.array(["Zeitpunkt"])
     r=np.array(["Gesamtanzahl der Genesenen"])
-    #daten=np.array([[0],[0]])
     for i in np.arange(0,T+0.1,1):
         t=np.append(t,[str(int(i))+(11-len(str(i)))*" "])
+        #nur für die formatierung leerzeichen eingefügt
         r=np.append(r,[str(int(methods.epidlös(gamma,beta0,i,s0,i0,0)[2]*N))])
     daten=np.vstack((t,r))
     daten=daten.T
-    np.savetxt("daten.sir.txt",daten,fmt="%s",delimiter=" ")
+    np.savetxt("daten.sir.txt",daten,fmt="%s")
 
 def Phasenportrait():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
