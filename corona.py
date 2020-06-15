@@ -40,7 +40,7 @@ def DatenSir():
     daten=daten.T
     np.savetxt("daten.sir.txt",daten,fmt="%10s")
 
-def Phasenportrait():
+def PhasenportraitEp():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
     xstartwerte= []
     ystartwerte = []
@@ -67,16 +67,44 @@ def Phasenportrait():
         
     plot.ylim(0, 1)
     plot.xlim(0, 1)
-    plot.title("Phasenportrait des SIR Modells")
+    plot.title("Phasenportrait des epidemischen SIR Modells")
     plot.xlabel("Anteil Anfällige s")
     plot.ylabel("Anteil Infektiöse i")
     plot.show
     
+def PhasenportraitEnd():
+    gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
+    #my=0.00003653
+    xstartwerte=[]
+    ystartwerte=[]
+    for s in np.arange(0.0,1.05,0.1):
+        xstartwerte.append(1-s)
+        ystartwerte.append(s)
+    plot.plot(xstartwerte,ystartwerte,color="b")
+    for i in range(len(xstartwerte)):
+        x=np.array([])
+        y=np.array([])
+        xw=xstartwerte[i]
+        yw=ystartwerte[i]
+        while yw>0.003:
+            x=np.append(x,[xw])
+            y=np.append(y,[yw])
+            xw,yw,a=methods.endlös(my,gamma,beta0,3,xw,yw,0)
+        plot.plot(x,y,"b--")
+        if len(x)!=0:
+            line=plot.plot(x,y,"b--")[0]
+            methods.AddArrow(line, position=0.065,color="b")
+    
+    plot.ylim(0,1)
+    plot.xlim(0,1)
+    plot.title("Phasenportrait des endemischen SIR Modells")
+    plot.xlabel("Anteil Anfällige s")
+    plot.ylabel("Anteil Infektiöse i")
+    plot.show()
 
-gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
-#my = 0.00003
 #print("Infizierte in D nach", T, " Tagen: ", methods.endlös(my,gamma, beta0, T,s0,i0,0) )
 #print("Infizierte in D nach", T, " Tagen: ", methods.epidlös(gamma, beta0, T,s0,i0,0) )
-print(DatenSir())
-
+#print(DatenSir())
+#print(PhasenportraitEp())
+print(PhasenportraitEnd())
 
