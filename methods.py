@@ -143,6 +143,7 @@ def epidlös(gamma, beta0, t,s_0,i_0,r_0):
                                      2000)
     #n gross wählen!!!
             
+           
 def endlös(my, gamma, beta0, t,s_0,i_0, r_0):
     '''
     Lösung des epidemischen Modells unter Benutzung von Euler \n
@@ -177,7 +178,8 @@ def endlös(my, gamma, beta0, t,s_0,i_0, r_0):
                                      t,
                                      2000)
     #n gross wählen!!!
-    
+
+
 """
 Created on Thu Jun  4 06:30:03 2020
 

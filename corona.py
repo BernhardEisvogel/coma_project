@@ -15,7 +15,7 @@ def EpVerlauf():
     t=[]
     s=[]
     i=[]
-    for r in np.arange(0,T+0.1,0.1):
+    for r in np.arange(0,T+0.1,2):
         t.append(r)
         s.append(methods.epidlös(gamma,beta0, r,s0,i0,0)[0])
         i.append(methods.epidlös(gamma,beta0, r,s0,i0,0)[1])
@@ -26,19 +26,20 @@ def EpVerlauf():
     plot.ylabel("Anteil der Anfälligen und Infizierten")
     plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
     plot.show()
-    #lange Laufzeit???
 
 def DatenSir():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
     N=83*(10**6)
     t=np.array(["Zeitpunkt"])
+    e=np.array(["Gesamtanzahl der Erkrankten"])
     r=np.array(["Gesamtanzahl der Genesenen"])
     for i in np.arange(0,T+0.1,1):
         t=np.append(t,[str(int(i))])
+        e=np.append(e,[str(int((1-methods.epidlös(gamma,beta0,i,s0,i0,0)[0])*N))])
         r=np.append(r,[str(int(methods.epidlös(gamma,beta0,i,s0,i0,0)[2]*N))])
-    daten=np.vstack((t,r))
+    daten=np.vstack((t,e,r))
     daten=daten.T
-    np.savetxt("daten.sir.txt",daten,fmt="%10s")
+    np.savetxt("daten.sir.txt",daten,fmt="%20s")
 
 def PhasenportraitEp():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
@@ -105,6 +106,6 @@ def PhasenportraitEnd():
 #print("Infizierte in D nach", T, " Tagen: ", methods.endlös(my,gamma, beta0, T,s0,i0,0) )
 #print("Infizierte in D nach", T, " Tagen: ", methods.epidlös(gamma, beta0, T,s0,i0,0) )
 #print(DatenSir())
+#print(EpVerlauf())
 #print(PhasenportraitEp())
-print(PhasenportraitEnd())
-
+#print(PhasenportraitEnd())
