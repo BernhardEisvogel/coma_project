@@ -10,15 +10,21 @@ import numpy as np ## nump schon in Folgen importiert
 import matplotlib.pyplot as plot
 #from matplotlib.lines import Line2D 
 
-def EpVerlauf():
-    gamma,beta0,T,s0,i0 = methods.SirLesen()
+def EpVerlauf(end = 'False', alpha = 0, T = None):
+    gamma, beta0, my, Tgelesen, s0,i0 = methods.SirDynLesen()
     t=[]
     s=[]
     i=[]
-    for r in np.arange(0,T+0.1,2):
+    if(T != None):
+        Tgelesen = T
+        
+    if(end == 'False'):
+        my = 0
+        
+    for r in np.arange(0,Tgelesen+0.1,2):
         t.append(r)
-        s.append(methods.epidlös(gamma,beta0, r,s0,i0,0)[0])
-        i.append(methods.epidlös(gamma,beta0, r,s0,i0,0)[1])
+        s.append(methods.epidlösGesamt(my, gamma,beta0,alpha, r,s0,i0,0)[0])
+        i.append(methods.epidlösGesamt(my, gamma,beta0,alpha, r,s0,i0,0)[1])
     plot.plot(t,s)
     plot.plot(t,i)
     plot.title("Zeitlicher Verlauf der Anfälligen und Infizierten")
@@ -26,22 +32,6 @@ def EpVerlauf():
     plot.ylabel("Anteil der Anfälligen und Infizierten")
     plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
     plot.show()
-    
-def EpVerlaufFallBack(alpha):
-    gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
-    t=[]
-    s=[]
-    i=[]
-    for r in np.arange(0,T+0.1,2):
-        t.append(r)
-        s.append(methods.endlösFallBack(my,gamma,beta0,alpha,r,s0,i0,0)[0])
-        i.append(methods.endlösFallBack(my,gamma,beta0,alpha,r,s0,i0,0)[1])
-    plot.plot(t,s)
-    plot.plot(t,i)
-    plot.title("Zeitlicher Verlauf der Anfälligen und Infizierten")
-    plot.xlabel("Zeit t")
-    plot.ylabel("Anteil der Anfälligen und Infizierten")
-    plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
     plot.show()
     
 
@@ -138,7 +128,7 @@ def PhasenportraitFallBack(alpha):
         while yw>0.003:
             x=np.append(x,[xw])
             y=np.append(y,[yw])
-            xw,yw,a=methods.endlösFallBack(my,gamma,beta0,alpha,4,xw,yw,0)
+            xw,yw,a=methods.epidlösGesamt(my,gamma,beta0,alpha,4,xw,yw,0)
         plot.plot(x,y,"b--")
         if len(x)!=0:
             line=plot.plot(x,y,"b--")[0]
@@ -146,7 +136,7 @@ def PhasenportraitFallBack(alpha):
     
     plot.ylim(0,1)
     plot.xlim(0,1)
-    plot.title("Phasenportrait des endemischen SIR Modells")
+    plot.title("Phasenportrait des endemischen SIR Modells mit Fall Back")
     plot.xlabel("Anteil Anfällige s")
     plot.ylabel("Anteil Infektiöse i")
     plot.show()
@@ -154,13 +144,14 @@ def PhasenportraitFallBack(alpha):
 #PhasenportraitFallBack(0.25)
 #EpVerlaufFallBack(0.25)
 #EpVerlauf()
+PhasenportraitFallBack(0.25)
 
-print("listo")
-gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
-T = 50
-print("End, Infizierte in D nach", T, " Tagen: ", methods.endlös(my,gamma, beta0, T,s0,i0,0) )
-print("Epi, Infizierte in D nach", T, " Tagen: ", methods.epidlös(gamma, beta0, T,s0,i0,0) )
-# print(DatenSir())
+# print("listo")
+# gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
+# T = 200
+# print("End, Infizierte in D nach", T, " Tagen: ", methods.endlös(my,gamma, beta0, T,s0,i0,0) )
+# print("Epi, Infizierte in D nach", T, " Tagen: ", methods.epidlös(gamma, beta0, T,s0,i0,0) )
+
 # print(EpVerlauf())
 # print(PhasenportraitEp())
 # print(PhasenportraitEnd())

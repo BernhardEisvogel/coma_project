@@ -172,14 +172,14 @@ def endlös(my, gamma, beta0, t,s_0,i_0, r_0):
     else:
         return ForwardEuler(lambda t,y: 
                             np.array([my - my* y[0]-beta0*y[0]*y[1],
-                                      (-1) * my * i_0 + beta0*y[0]*y[1]-gamma * y[1],
+                                      (-1) * my * y[1] + beta0*y[0]*y[1]-gamma * y[1],
                                       (-1) * my*y[2]+ gamma * y[1]]),
                                      y_0,
                                      t,
                                      2000)
     #n gross wählen!!!
 
-def endlösFallBack(my, gamma, beta0, alpha, t,s_0,i_0, r_0):
+def epidlösGesamt(my, gamma, beta0, alpha, t,s_0,i_0, r_0):
     '''
     Lösung des epidemischen Modells unter Benutzung von Euler \n
     Funktion der Anfälligen s(t) \n
