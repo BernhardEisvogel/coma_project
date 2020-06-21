@@ -179,6 +179,39 @@ def endlös(my, gamma, beta0, t,s_0,i_0, r_0):
                                      2000)
     #n gross wählen!!!
 
+def endlösFallBack(my, gamma, beta0, alpha, t,s_0,i_0, r_0):
+    '''
+    Lösung des epidemischen Modells unter Benutzung von Euler \n
+    Funktion der Anfälligen s(t) \n
+    und Infizierten i(t) 
+
+    Parameters
+    ----------
+    N: Anzahl der Menschen
+    gamma : float, Inverse der Durchschnittlichen Zeit, \n
+    in der ein erkrankter ansteckend ist
+    beta0 : float, Kontaktrate
+    t : float, Zeitpunkt  
+    s0 : float, Anfangswerte Anfällige 
+    i0 : float, Anfangswert Infizierte
+
+    Returns
+    -------
+    array, enthält Anzahl Anfällige s(t) \n
+    und Infizierte i(t)
+
+    '''
+    y_0 = np.array([s_0,i_0,r_0])
+    if t==0:
+        return y_0
+    else:
+        return ForwardEuler(lambda t,y: 
+                            np.array([my - my* y[0]-beta0*y[0]*y[1],
+                                      (-1) * my * i_0 + beta0*y[0]*y[1]-gamma * y[1] + alpha * y[2],
+                                      (-1) * (my + alpha)*y[2]+ gamma * y[1]]),
+                                     y_0,
+                                     t,
+                                     2000)
 
 """
 Created on Thu Jun  4 06:30:03 2020

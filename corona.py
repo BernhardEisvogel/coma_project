@@ -8,7 +8,7 @@ Created on Wed Jun 10 15:35:43 2020
 import methods
 import numpy as np ## nump schon in Folgen importiert
 import matplotlib.pyplot as plot
-from matplotlib.lines import Line2D 
+#from matplotlib.lines import Line2D 
 
 def EpVerlauf():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
@@ -26,6 +26,24 @@ def EpVerlauf():
     plot.ylabel("Anteil der Anfälligen und Infizierten")
     plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
     plot.show()
+    
+def EpVerlaufFallBack(alpha):
+    gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
+    t=[]
+    s=[]
+    i=[]
+    for r in np.arange(0,T+0.1,2):
+        t.append(r)
+        s.append(methods.endlösFallBack(my,gamma,beta0,alpha,r,s0,i0,0)[0])
+        i.append(methods.endlösFallBack(my,gamma,beta0,alpha,r,s0,i0,0)[1])
+    plot.plot(t,s)
+    plot.plot(t,i)
+    plot.title("Zeitlicher Verlauf der Anfälligen und Infizierten")
+    plot.xlabel("Zeit t")
+    plot.ylabel("Anteil der Anfälligen und Infizierten")
+    plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
+    plot.show()
+    
 
 def DatenSir():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
@@ -90,7 +108,37 @@ def PhasenportraitEnd():
         while yw>0.003:
             x=np.append(x,[xw])
             y=np.append(y,[yw])
-            xw,yw,a=methods.endlös(my,gamma,beta0,3,xw,yw,0)
+            xw,yw,a=methods.endlös(my,gamma,beta0,2,xw,yw,0)
+        plot.plot(x,y,"b--")
+        if len(x)!=0:
+            line=plot.plot(x,y,"b--")[0]
+            methods.AddArrow(line, position=0.065,color="b")
+    
+    plot.ylim(0,1)
+    plot.xlim(0,1)
+    plot.title("Phasenportrait des endemischen SIR Modells")
+    plot.xlabel("Anteil Anfällige s")
+    plot.ylabel("Anteil Infektiöse i")
+    plot.show()
+    
+def PhasenportraitFallBack(alpha):
+    gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
+    #my=0.00003653
+    xstartwerte=[]
+    ystartwerte=[]
+    for s in np.arange(0.0,1.05,0.1):
+        xstartwerte.append(1-s)
+        ystartwerte.append(s)
+    plot.plot(xstartwerte,ystartwerte,color="b")
+    for i in range(len(xstartwerte)):
+        x=np.array([])
+        y=np.array([])
+        xw=xstartwerte[i]
+        yw=ystartwerte[i]
+        while yw>0.003:
+            x=np.append(x,[xw])
+            y=np.append(y,[yw])
+            xw,yw,a=methods.endlösFallBack(my,gamma,beta0,alpha,4,xw,yw,0)
         plot.plot(x,y,"b--")
         if len(x)!=0:
             line=plot.plot(x,y,"b--")[0]
@@ -103,9 +151,16 @@ def PhasenportraitEnd():
     plot.ylabel("Anteil Infektiöse i")
     plot.show()
 
-#print("Infizierte in D nach", T, " Tagen: ", methods.endlös(my,gamma, beta0, T,s0,i0,0) )
-#print("Infizierte in D nach", T, " Tagen: ", methods.epidlös(gamma, beta0, T,s0,i0,0) )
-#print(DatenSir())
-#print(EpVerlauf())
-#print(PhasenportraitEp())
-#print(PhasenportraitEnd())
+#PhasenportraitFallBack(0.25)
+#EpVerlaufFallBack(0.25)
+#EpVerlauf()
+
+print("listo")
+gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
+T = 50
+print("End, Infizierte in D nach", T, " Tagen: ", methods.endlös(my,gamma, beta0, T,s0,i0,0) )
+print("Epi, Infizierte in D nach", T, " Tagen: ", methods.epidlös(gamma, beta0, T,s0,i0,0) )
+# print(DatenSir())
+# print(EpVerlauf())
+# print(PhasenportraitEp())
+# print(PhasenportraitEnd())
