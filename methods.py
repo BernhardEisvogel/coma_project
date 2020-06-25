@@ -206,8 +206,8 @@ def epidlösGesamt(my, gamma, beta0, alpha, t,s_0,i_0, r_0):
         return y_0
     else:
         return ForwardEuler(lambda t,y: 
-                            np.array([my - my* y[0]-beta0*y[0]*y[1],
-                                      (-1) * my * i_0 + beta0*y[0]*y[1]-gamma * y[1] + alpha * y[2],
+                            np.array([my - my* y[0]-beta0*y[0]*y[1] + alpha * y[2],
+                                      (-1) * my * i_0 + beta0*y[0]*y[1]-gamma * y[1],
                                       (-1) * (my + alpha)*y[2]+ gamma * y[1]]),
                                      y_0,
                                      t,
