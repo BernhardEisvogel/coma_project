@@ -6,34 +6,32 @@ Created on Wed Jun 10 15:35:43 2020
 @author: Louisa Weber, Bernhard Eisvogel
 """
 import methods
-import numpy as np ## nump schon in Folgen importiert
+import numpy as np
 import matplotlib.pyplot as plot
-#from matplotlib.lines import Line2D 
+import math
+from scipy.stats import linregress 
 
-def EpVerlauf(end = 'False', alpha = 0, T = None):
+def EpVerlauf():
     gamma, beta0, my, Tgelesen, s0,i0 = methods.SirDynLesen()
-    t=[]
-    s=[]
-    i=[]
-    if(T != None):
-        Tgelesen = T
-        
-    if(end == 'False'):
-        my = 0
-        
+    t=[0]
+    s=[s0]
+    i=[i0]
+    rec=[0]
     for r in np.arange(0,Tgelesen+0.1,2):
         t.append(r)
-        s.append(methods.epidlösGesamt(my, gamma,beta0,alpha, r,s0,i0,0)[0])
-        i.append(methods.epidlösGesamt(my, gamma,beta0,alpha, r,s0,i0,0)[1])
+        loesung = methods.endlös(my, gamma, beta0, 2, s[len(s)-1],i[len(i)-1],rec[len(rec)-1])
+        s.append(loesung[0])
+        i.append(loesung[1])
+        rec.append(loesung[2])
     plot.plot(t,s)
     plot.plot(t,i)
+    #plot.plot(t,rec)
     plot.title("Zeitlicher Verlauf der Anfälligen und Infizierten")
     plot.xlabel("Zeit t")
     plot.ylabel("Anteil der Anfälligen und Infizierten")
     plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
     plot.show()
     plot.show()
-    
 
 def DatenSir():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
@@ -110,36 +108,6 @@ def PhasenportraitEnd():
     plot.xlabel("Anteil Anfällige s")
     plot.ylabel("Anteil Infektiöse i")
     plot.show()
-    
-def PhasenportraitFallBack(alpha):
-    gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
-    #my=0.00003653
-    xstartwerte=[]
-    ystartwerte=[]
-    for s in np.arange(0.0,1.05,0.1):
-        xstartwerte.append(1-s)
-        ystartwerte.append(s)
-    plot.plot(xstartwerte,ystartwerte,color="b")
-    for i in range(len(xstartwerte)):
-        x=np.array([])
-        y=np.array([])
-        xw=xstartwerte[i]
-        yw=ystartwerte[i]
-        while yw>0.003:
-            x=np.append(x,[xw])
-            y=np.append(y,[yw])
-            xw,yw,a=methods.epidlösGesamt(my,gamma,beta0,alpha,4,xw,yw,0)
-        plot.plot(x,y,"b--")
-        if len(x)!=0:
-            line=plot.plot(x,y,"b--")[0]
-            methods.AddArrow(line, position=0.065,color="b")
-    
-    plot.ylim(0,1)
-    plot.xlim(0,1)
-    plot.title("Phasenportrait des endemischen SIR Modells mit Fall Back")
-    plot.xlabel("Anteil Anfällige s")
-    plot.ylabel("Anteil Infektiöse i")
-    plot.show()
 
 def Verlaufaktuell():
     inf=methods.TabelleLesen()
@@ -189,20 +157,83 @@ def Prognose():
     #Progonse für 1.7. bei Kontaktrate vom 24.6.
     prognose=int(methods.endlös(my,gamma,beta,datum,(N-130)/N,130/N,0)[1]*N)
     return prognose
-#print(Prognose())
-#print(Verlaufaktuell())
 
-#PhasenportraitFallBack(0.25)
-#EpVerlaufFallBack(0.25)
-#EpVerlauf()
-PhasenportraitFallBack(0.25)
 
-# print("listo")
-# gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
-# T = 200
-# print("End, Infizierte in D nach", T, " Tagen: ", methods.endlös(my,gamma, beta0, T,s0,i0,0) )
-# print("Epi, Infizierte in D nach", T, " Tagen: ", methods.epidlös(gamma, beta0, T,s0,i0,0) )
+def fehlerBerechnenAbsolut():
+    '''
+    Diese Funktion zeichnet ein Schaubild zur Visualisierung der Ungenauigkeit \n
+    des Eulerapproximationsverfahren. 
 
-# print(EpVerlauf())
-# print(PhasenportraitEp())
-# print(PhasenportraitEnd())
+    Returns
+    -------
+    None.
+
+    '''
+    beta0 = 1
+    gamma = 0
+    s0   = -9
+    i0    = 10
+    r0 = 0
+    t= 2 # \in (0,10)
+    x =[]
+    i = []
+    s = []
+    echteWerte = [1-(math.exp(t))/(math.exp(t) -0.9),(math.exp(t))/(math.exp(t) -0.9),0]
+    for n in 1000, 2000, 4000, 8000, 16000:
+        approximiert = methods.epidlös(gamma, beta0, t, s0,i0,r0, schritte = n)
+        x.append(n)
+        i.append(abs(approximiert[1]-echteWerte[1]))
+        s.append(abs(approximiert[0]-echteWerte[0]))
+    plot.plot(x,i, 'b--',linewidth=2)
+    plot.plot(x,s,'r-',linewidth=1)
+    plot.title("Vergleich der Fehler der Approximierung")
+    plot.xlabel("Anzahl der Schritte")
+    plot.ylabel("Absoluter Fehler")
+    plot.legend(["Fehler bei den Infizierte", "Fehler bei den Anfälligen"])
+    plot.show()
+        
+def fehlerVergleichloglog():
+    '''
+    Diese Funktion zeigt die Ungenauigkeit des Euelrapproximationsverfahren auf
+    einer doppelt Logarithmsichen Skala an und vergleicht ihn mit einer Funktion
+    der Form f(n) = c/n zur Fehlervorhersage.
+
+    Returns
+    -------
+    None.
+
+    '''
+    beta0 = 1
+    gamma = 0
+    s0   = -9
+    i0    = 10
+    r0 = 0
+    t= 5 # \in (0,10)
+    x =[]
+    i = []
+    s = []
+    f= []
+    echteWerte = [1-(math.exp(t))/(math.exp(t) -0.9),(math.exp(t))/(math.exp(t) -0.9),0]
+    for n in 1000, 2000, 4000, 8000, 16000:
+        approximiert = methods.epidlös(gamma, beta0, t, s0,i0,r0, schritte = n)
+        x.append(n)
+        i.append(abs(approximiert[1]-echteWerte[1]))
+        s.append(abs(approximiert[0]-echteWerte[0]))
+    plot.loglog(x,i, 'b--',linewidth=4)
+    plot.loglog(x,s,'b-',linewidth=2)
+    
+    for j in range(0,len(i)):
+        i[j] = math.log(i[j])
+    xinlog = []
+    for r in range(0,len(x)):
+        xinlog.append(math.log(x[r]))
+            
+    print(linregress(xinlog,i))
+    c = pow(math.e, linregress(xinlog,i).intercept) 
+    for n in 1000, 2000, 4000, 8000, 16000:
+        f.append(c/n)
+    plot.loglog(x,f,'r-',linewidth=1)
+    plot.title("Vergleich des Fehlers des Eulerverfahrens \n mit der Fehlerfunktion f für t=" + str(t))
+    plot.xlabel("Anzahl der Schritte")
+    plot.ylabel("Absoluter Fehler")
+    plot.legend(["Fehler bei den Infizierte", "Fehler bei den Anfälligen", "f-Funktion mit c= %.3f" % c])

@@ -110,9 +110,9 @@ def ForwardKutta4(fun, y0, T, n):
 
 
 
-def epidlös(gamma, beta0, t,s_0,i_0,r_0):
+def epidlös(gamma, beta0, t,s_0,i_0,r_0, schritte = 2000, kutta=False):
     '''
-    Lösung des epidemischen Modells unter Benutzung von Euler \n
+    Lösung des epidemischen Modells unter Benutzung von Euler/RungeKutta \n
     Funktion der Anfälligen s(t) \n
     und Infizierten i(t) 
 
@@ -124,48 +124,63 @@ def epidlös(gamma, beta0, t,s_0,i_0,r_0):
     t : float, Zeitpunkt  
     s0 : float, Anfangswerte Anfällige 
     i0 : float, Anfangswert Infizierte
+    schritte : int, Dieser Parameter ist optional (standartwert 2000) 
+    und gibt die Anzahl der Schritte an, die bis zum Zeitpunkt t durchgeführt 
+    werden sollen
+    kutta : bool, dieser Parameter ist optional (standartwert false) und gibt an, 
+    ob an Stelle des Eulerverfahrens das Rungeuuttaverfahren benutzt werden soll.
 
     Returns
     -------
-    array, enthält normierte Anzahl Anfällige s(t) \n
-    und Infizierte i(t)
+    array, enthält normierte Anzahl Anfällige s(t), \n
+    Infizierte i(t) und genesene r(t)
 
     '''
     y_0=np.array([s_0,i_0,r_0])
     if t==0:
         return y_0
     else:
-        return ForwardEuler(lambda t,y: 
-                            np.array([(-1)*beta0*y[0]*y[1],
-                                      beta0*y[0]*y[1]-gamma*y[1], gamma * y[1]]),
-                                     y_0,
-                                     t,
-                                     2000)
+        if(kutta==False):
+            return ForwardEuler(lambda t,y: 
+                                np.array([(-1)*beta0*y[0]*y[1],
+                                          beta0*y[0]*y[1]-gamma*y[1], gamma * y[1]]),
+                                         y_0,
+                                         t,
+                                         schritte)
+        else: 
+            return ForwardKutta4(lambda t,y: 
+                                np.array([(-1)*beta0*y[0]*y[1],
+                                          beta0*y[0]*y[1]-gamma*y[1], gamma * y[1]]),
+                                         y_0,
+                                         t,
+                                         schritte)
     #n gross wählen!!!
             
            
-def endlös(my, gamma, beta0, t,s_0,i_0, r_0):
+def endlös(my, gamma, beta0, t, s_0, i_0, r_0, schritte = 2000):
     '''
-    Lösung des epidemischen Modells unter Benutzung von Euler \n
+    Lösung des endemischen Modells unter Benutzung von Euler/Rungekutta \n
     Funktion der Anfälligen s(t) \n
     und Infizierten i(t) 
 
-    Parameters
+       Parameters
     ----------
-    N: Anzahl der Menschen
+    my : float, Geburtenrate
     gamma : float, Inverse der Durchschnittlichen Zeit, \n
     in der ein erkrankter ansteckend ist
     beta0 : float, Kontaktrate
     t : float, Zeitpunkt  
     s0 : float, Anfangswerte Anfällige 
     i0 : float, Anfangswert Infizierte
+    schritte : int, Dieser Parameter ist optional (standartwert 2000) 
+    und gibt die Anzahl der Schritte an, die bis zum Zeitpunkt t durchgeführt 
+    werden sollen
 
     Returns
     -------
-    array, enthält Anzahl Anfällige s(t) \n
-    und Infizierte i(t)
-
-    '''
+    array, enthält normierte Anzahl Anfällige s(t), \n
+    Infizierte i(t) und genesene r(t)
+'''
     y_0 = np.array([s_0,i_0,r_0])
     if t==0:
         return y_0
@@ -176,42 +191,9 @@ def endlös(my, gamma, beta0, t,s_0,i_0, r_0):
                                       (-1) * my*y[2]+ gamma * y[1]]),
                                      y_0,
                                      t,
-                                     2000)
+                                     schritte)
     #n gross wählen!!!
-
-def epidlösGesamt(my, gamma, beta0, alpha, t,s_0,i_0, r_0):
-    '''
-    Lösung des epidemischen Modells unter Benutzung von Euler \n
-    Funktion der Anfälligen s(t) \n
-    und Infizierten i(t) 
-
-    Parameters
-    ----------
-    N: Anzahl der Menschen
-    gamma : float, Inverse der Durchschnittlichen Zeit, \n
-    in der ein erkrankter ansteckend ist
-    beta0 : float, Kontaktrate
-    t : float, Zeitpunkt  
-    s0 : float, Anfangswerte Anfällige 
-    i0 : float, Anfangswert Infizierte
-
-    Returns
-    -------
-    array, enthält Anzahl Anfällige s(t) \n
-    und Infizierte i(t)
-
-    '''
-    y_0 = np.array([s_0,i_0,r_0])
-    if t==0:
-        return y_0
-    else:
-        return ForwardEuler(lambda t,y: 
-                            np.array([my - my* y[0]-beta0*y[0]*y[1] + alpha * y[2],
-                                      (-1) * my * i_0 + beta0*y[0]*y[1]-gamma * y[1],
-                                      (-1) * (my + alpha)*y[2]+ gamma * y[1]]),
-                                     y_0,
-                                     t,
-                                     2000)
+         
 def TabelleLesen():
     """
     Rückgabe der aus der Datei "Tabellendaten.txt" eingelesenen Daten 
