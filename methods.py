@@ -334,3 +334,71 @@ def AddArrow(line, position=None, direction='right', size=15, color=None):
         size=size
     )
 
+def maximalWert(gamma, beta0, t, s_0, i_0, r_0, p, schritte = 2000):
+    '''
+    Lösung des epidemischen Modells unter Berücksichtung der Impfungsrate p.
+    Gibt außerdem max(i) zurück
+
+    Parameters
+    ----------
+    gamma : float, Inverse der Durchschnittlichen Zeit, \n
+    in der ein erkrankter ansteckend ist
+    beta0 : float, Kontaktrate
+    t : float, Zeitpunkt  
+    s0 : float, Anfangswerte Anfällige 
+    i0 : float, Anfangswert Infizierte
+    schritte : int, Dieser Parameter ist optional (standartwert 2000) 
+    und gibt die Anzahl der Schritte an, die bis zum Zeitpunkt t durchgeführt 
+    werden sollen
+    kutta : bool, dieser Parameter ist optional (standartwert false) und gibt an, 
+    ob an Stelle des Eulerverfahrens das Rungeuuttaverfahren benutzt werden soll.
+
+    Returns
+    -------
+    array, enthält normierte Anzahl Anfällige s(t), \n
+    Infizierte i(t) und genesene r(t)\
+    
+    float, maximum der Infizierten
+
+    '''
+
+    y_0=np.array([s_0,i_0,r_0])
+    if t==0:
+        return y_0
+    else:
+        return ForwardEulerMitMax(lambda t,y: 
+                            np.array([(-1)*beta0*y[0]*y[1] - p,
+                                      beta0*y[0]*y[1]-gamma*y[1], 
+                                      gamma * y[1] +p]),
+                                     y_0,
+                                     t,
+                                     schritte)
+
+    #n gross wählen!!!
+def ForwardEulerMitMax(fun, y0, T,n):
+    '''ForwardEulerMitMax nimmt als Parameter: \n
+        fun, Ableitung der Funktion abhängig von x und y \n
+        y0,  Anfangswert \n
+        T, Endzeitpunkt \n
+        n, Anzahl der Iterationsschritte
+         \n
+        Als Approximationsverfahren wird das Euelerverfahren benutzt
+        
+        Zusätzlich zur Lösung gibt diese Funktion auch das Maximum des zweiten
+        Wertes des Eingabevektors zurück.
+        '''
+    n = n+1 # Es sollen n + 1 Punkte diskretisiert werden  
+    Schritt = y0         
+    maximalInfiziert = 0
+    for i in range(n): 
+        Schritt = Schritt +  T/n * fun(T/n * i, Schritt)
+        if(Schritt[1] > maximalInfiziert):
+            maximalInfiziert = Schritt[1]
+        Schritt[1] = identiodernull(Schritt[1])
+        Schritt[0] = identiodernull(Schritt[0])
+    return Schritt, maximalInfiziert
+
+def identiodernull(r):
+    if(r<0): return 0
+    else: 
+        return r

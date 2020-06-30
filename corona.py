@@ -16,16 +16,17 @@ def EpVerlauf():
     t=[0]
     s=[s0]
     i=[i0]
-    rec=[0]
+    rec=[0] # Dieser Wert wird zwar aktuell nicht benötigt, steht aber da für 
+            # zukünftige Überlegungen
     for r in np.arange(0,Tgelesen+0.1,2):
         t.append(r)
-        loesung = methods.endlös(my, gamma, beta0, 2, s[len(s)-1],i[len(i)-1],rec[len(rec)-1])
+        loesung = methods.endlös(my, gamma, beta0, 2, s[len(s)-1],i[len(i)-1],
+                                 rec[len(rec)-1])
         s.append(loesung[0])
         i.append(loesung[1])
         rec.append(loesung[2])
     plot.plot(t,s)
     plot.plot(t,i)
-    #plot.plot(t,rec)
     plot.title("Zeitlicher Verlauf der Anfälligen und Infizierten")
     plot.xlabel("Zeit t")
     plot.ylabel("Anteil der Anfälligen und Infizierten")
@@ -64,8 +65,6 @@ def PhasenportraitEp():
             x = np.append(x,[xw])
             y = np.append(y,[yw])
             xw,yw, a = methods.epidlös(gamma, beta0, 3,xw,yw,0)
-            # besitzt keine weitere Bedeutung verhindert aber, 
-            # dass eine zweite FUnktion geschrieben werden muss
         
         plot.plot(x,y,'b--')
         if(len(x) != 0 and len(y) != 0):
@@ -117,7 +116,8 @@ def Verlaufaktuell():
     N=83*(10**6)
     for i in range(0,len(inf),1):
         t.append(i)
-        I.append(N*(methods.endlös(1/27375,1/6.5,Kontakt[i],i,(N-130)/N,130/N,0)[1]))
+        I.append(N*(methods.endlös(1/27375,1/6.5,Kontakt[i],i,(N-130)/N,
+                                   130/N,0)[1]))
 
     plot.plot(t,inf)
     plot.plot(t,I)
@@ -153,28 +153,34 @@ def Prognose():
     eps=abs((methods.endlös(my,gamma,beta,aktdat,(N-130)/N,130/N,0)[1]*N-aktinf)/aktinf)
     while (eps>=0.05 and beta<1):
         beta=round(beta+0.001,4)#evt kleiner wählen
-        eps=abs((methods.endlös(my,gamma,beta,aktdat,(N-130)/N,130/N,0)[1]*N-aktinf)/aktinf)
+        eps=abs((methods.endlös(my,gamma,beta,aktdat,(N-130)/N,
+                                130/N,0)[1]*N-aktinf)/aktinf)
     #Progonse für 1.7. bei Kontaktrate vom 24.6.
     prognose=int(methods.endlös(my,gamma,beta,datum,(N-130)/N,130/N,0)[1]*N)
     return prognose
 
 
-def fehlerBerechnenAbsolut():
+def fehlerBerechnenAbsolut(t):
     '''
     Diese Funktion zeichnet ein Schaubild zur Visualisierung der Ungenauigkeit \n
-    des Eulerapproximationsverfahren. 
+    des Eulerapproximationsverfahren. Nimmt als Variable den Zeitpunkt 0<=t<10\n
+    an, für den der Fehler visualisiert werden soll
 
     Returns
     -------
     None.
 
     '''
+    
+    if(t<=0 or t>10):
+        print("Bitte geben sie einen gültigen t-Wert ein!")
+        exit()
+    
     beta0 = 1
     gamma = 0
     s0   = -9
     i0    = 10
     r0 = 0
-    t= 2 # \in (0,10)
     x =[]
     i = []
     s = []
@@ -192,23 +198,28 @@ def fehlerBerechnenAbsolut():
     plot.legend(["Fehler bei den Infizierte", "Fehler bei den Anfälligen"])
     plot.show()
         
-def fehlerVergleichloglog():
+def fehlerVergleichloglog(t):
     '''
     Diese Funktion zeigt die Ungenauigkeit des Euelrapproximationsverfahren auf
     einer doppelt Logarithmsichen Skala an und vergleicht ihn mit einer Funktion
-    der Form f(n) = c/n zur Fehlervorhersage.
+    der Form f(n) = c/n zur Fehlervorhersage .Nimmt als Variable den Zeitpunkt 0<=t<10\n
+    an, für den der Fehler visualisiert werden soll
 
     Returns
     -------
     None.
 
     '''
+    if(t<=0 or t>10):
+        print("Bitte geben sie einen gültigen t-Wert ein!")
+        exit()
+    
+    
     beta0 = 1
     gamma = 0
     s0   = -9
     i0    = 10
     r0 = 0
-    t= 5 # \in (0,10)
     x =[]
     i = []
     s = []
@@ -233,7 +244,75 @@ def fehlerVergleichloglog():
     for n in 1000, 2000, 4000, 8000, 16000:
         f.append(c/n)
     plot.loglog(x,f,'r-',linewidth=1)
-    plot.title("Vergleich des Fehlers des Eulerverfahrens \n mit der Fehlerfunktion f für t=" + str(t))
+    plot.title("Vergleich des Fehlers des Eulerverfahrens \n mit der"+ 
+               "Fehlerfunktion f für t=" + str(t))
     plot.xlabel("Anzahl der Schritte")
     plot.ylabel("Absoluter Fehler")
-    plot.legend(["Fehler bei den Infizierte", "Fehler bei den Anfälligen", "f-Funktion mit c= %.3f" % c])
+    plot.legend(["Fehler bei den Infizierte", "Fehler bei den Anfälligen", 
+                 "f-Funktion mit c= %.3f" % c])
+
+def EpVerlaufMitImpfung(TBeginnImpfung = 6, TEndeImpfung = 80,p = 0.001):
+    '''
+    Diese Funktion zeigt die Ungenauigkeit des Euelrapproximationsverfahren auf
+    einer doppelt Logarithmsichen Skala an und vergleicht ihn mit einer Funktion
+    der Form f(n) = c/n zur Fehlervorhersage .Nimmt als Variable den Zeitpunkt 0<=t<10\n
+    an, für den der Fehler visualisiert werden soll
+
+    Returns
+    -------
+    None.
+
+    '''
+    
+    TEndeModell = 130
+    if(TEndeImpfung > TEndeModell): print("Sie haben ungültige Parameter für die Impf-\n" + 
+                                          "dauer angegeben")
+    beta0 = 0.472
+    Bevoelkerung = 82000000
+    maximaleInfiziertenanzahl = 350000
+    gamma = 1/6.5
+    i0=1/ 82000000
+    s0=1-i0
+    t=[0]
+    s=[s0]
+    i=[i0]
+    rec=[0]
+    for r in np.arange(0,TBeginnImpfung,1): #Vor der Impfung
+        t.append(r)
+        loesung = methods.endlös(0, gamma, beta0, 1, s[len(s)-1],i[len(i)-1],
+                                 rec[len(rec)-1])
+        s.append(loesung[0])
+        i.append(loesung[1])
+        rec.append(loesung[2])
+    maximal = 0 # benötigt zur Betrachtung der Belastungsgrenze des Krankenhauses
+    for r in np.arange(TBeginnImpfung,TEndeImpfung,1): #während der Impfperiode
+        t.append(r)
+        loesung, maximalneu = methods.maximalWert(gamma, beta0, 1, s[len(s)-1],
+                                                  i[len(i)-1],rec[len(rec)-1],p)
+        if(maximalneu > maximal): maximal = maximalneu
+        s.append(loesung[0])
+        i.append(loesung[1])
+        rec.append(loesung[2])
+    for r in np.arange(TEndeImpfung,TEndeModell,1): # nach der Impfperiode
+        t.append(r)
+        loesung, maximalneu = methods.maximalWert(gamma, beta0, 1, s[len(s)-1],
+                                                  i[len(i)-1],rec[len(rec)-1],0)
+        if(maximalneu > maximal): maximal = maximalneu
+        s.append(loesung[0])
+        i.append(loesung[1])
+        rec.append(loesung[2])
+        
+    
+    plot.plot(t,s,color='b')
+    plot.plot(t,i,color='orange') 
+    plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
+    plot.axvline(x=TBeginnImpfung-1, linewidth=0.5, color='r')
+    plot.axhline(y=maximaleInfiziertenanzahl /Bevoelkerung, linewidth=0.5, color='r')
+    plot.axvline(x=TEndeImpfung-1, linewidth=0.5, color='r')
+    print("Die maximale Infiziertenanzahl beträgt: %.0f" %(maximal * Bevoelkerung))
+    plot.title("Zeitlicher Verlauf der Anfälligen und Infizierten mit Impfung")
+    plot.xlabel("Zeit t in Tagen")
+    plot.ylabel("Anteil der Anfälligen und Infizierten")
+    plot.show()
+    plot.show()
+EpVerlaufMitImpfung()
