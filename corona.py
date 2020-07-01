@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jun 10 15:35:43 2020
-
 @author: Louisa Weber, Bernhard Eisvogel
 """
 import methods
@@ -17,7 +16,7 @@ def EpVerlauf():
     s=[s0]
     i=[i0]
     rec=[0] # Dieser Wert wird zwar aktuell nicht benötigt, steht aber da für 
-        
+            # zukünftige Überlegungen
     for r in np.arange(0,Tgelesen+0.1,2):
         t.append(r)
         loesung = methods.endlös(my, gamma, beta0, 2, s[len(s)-1],i[len(i)-1],
@@ -33,6 +32,7 @@ def EpVerlauf():
     plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
     plot.show()
     plot.show()
+
 def DatenSir():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
     N=83*(10**6)
@@ -127,18 +127,30 @@ def Verlaufaktuell():
             [ "1.3.20", "31.03.20", "30.04.20", "27.05.20" ] )
     plot.legend(["Tabellendaten", "Errechnete Daten"])
     plot.show()
-
+    
+def KontaktrateVerlauf():
+    x=[]
+    y=[]
+    k=methods.Kontaktrate(87)
+    for i in range(0,88,1):
+        x.append(i)
+        y.append(k[i])
+    plot.plot(x,y)
+    plot.title("Zeitlicher Verlauf der Kontaktrate")
+    plot.xlabel("Datum")
+    plot.ylabel("Kontaktrate")
+    plot.xticks( [0, 30, 60, 87],
+            [ "1.3.20", "31.03.20", "30.04.20", "27.05.20" ] )
+    plot.show()
 
 def Prognose():
     """
     Prognose für die Infiziertenzahl am 1.7. ausgehend von \n
     der Infiziertenzahl am 24.6. unter der Annahme einer konstanten \n
     Kontaktrate ab 24.6.
-
     Returns
     -------
     prognose : integer, prognostizierte Infiziertenzahl am 1.7.
-
     """
     N=83*(10**6)
     my=1/27375
@@ -156,19 +168,17 @@ def Prognose():
                                 130/N,0)[1]*N-aktinf)/aktinf)
     #Progonse für 1.7. bei Kontaktrate vom 24.6.
     prognose=int(methods.endlös(my,gamma,beta,datum,(N-130)/N,130/N,0)[1]*N)
-    print("Vorraussichtlich sind am 01.07.2020: " + str(prognose) + " Menschen infiziert")
-Prognose()
+    return prognose
+
 
 def fehlerBerechnenAbsolut(t):
     '''
     Diese Funktion zeichnet ein Schaubild zur Visualisierung der Ungenauigkeit \n
     des Eulerapproximationsverfahren. Nimmt als Variable den Zeitpunkt 0<=t<10\n
     an, für den der Fehler visualisiert werden soll
-
     Returns
     -------
     None.
-
     '''
     
     if(t<=0 or t>10):
@@ -203,11 +213,9 @@ def fehlerVergleichloglog(t):
     einer doppelt Logarithmsichen Skala an und vergleicht ihn mit einer Funktion
     der Form f(n) = c/n zur Fehlervorhersage .Nimmt als Variable den Zeitpunkt 0<=t<10\n
     an, für den der Fehler visualisiert werden soll
-
     Returns
     -------
     None.
-
     '''
     if(t<=0 or t>10):
         print("Bitte geben sie einen gültigen t-Wert ein!")
@@ -256,11 +264,9 @@ def EpVerlaufMitImpfung(TBeginnImpfung = 6, TEndeImpfung = 80,p = 0.001):
     einer doppelt Logarithmsichen Skala an und vergleicht ihn mit einer Funktion
     der Form f(n) = c/n zur Fehlervorhersage .Nimmt als Variable den Zeitpunkt 0<=t<10\n
     an, für den der Fehler visualisiert werden soll
-
     Returns
     -------
     None.
-
     '''
     
     TEndeModell = 130
@@ -314,4 +320,4 @@ def EpVerlaufMitImpfung(TBeginnImpfung = 6, TEndeImpfung = 80,p = 0.001):
     plot.ylabel("Anteil der Anfälligen und Infizierten")
     plot.show()
     plot.show()
-#EpVerlaufMitImpfung()
+EpVerlaufMitImpfung()
