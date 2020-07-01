@@ -28,30 +28,27 @@ def EpVerlauf(epi = True):
     s0 = 0
     i0 = 0
     t=[0]
-    rec=[0] # Dieser Wert wird zwar aktuell nicht benötigt, steht aber da für 
-            # zukünftige Überlegungen
+
     if(epi == True): 
         gamma, beta0, Tgelesen, s0,i0 = methods.SirLesen()
         s=[s0]
         i=[i0]
         for r in np.arange(1,Tgelesen+0.1,1):
             t.append(r)
-            loesung = methods.epidlös(gamma, beta0, 1, s[len(s)-1],i[len(i)-1],
-                                     rec[len(rec)-1])
+            loesung = methods.epidlös(gamma, beta0, 1, s[len(s)-1],i[len(i)-1])
             s.append(loesung[0])
             i.append(loesung[1])
-            rec.append(loesung[2])
+
     else:
         gamma, beta0, my, Tgelesen, s0,i0 = methods.SirDynLesen()
         s=[s0]
         i=[i0]
         for r in np.arange(1,Tgelesen+0.1,1):
             t.append(r)
-            loesung = methods.endlös(my, gamma, beta0, 1, s[len(s)-1],i[len(i)-1],
-                                     rec[len(rec)-1])
+            loesung = methods.endlös(my, gamma, beta0, 1, s[len(s)-1],i[len(i)-1])
+                                     
             s.append(loesung[0])
             i.append(loesung[1])
-            rec.append(loesung[2])
             
     plot.plot(t,s)
     plot.plot(t,i)
@@ -62,7 +59,6 @@ def EpVerlauf(epi = True):
     plot.show()
     plot.show()
     
-EpVerlauf(epi=False)
 
 def DatenSir():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
@@ -72,8 +68,9 @@ def DatenSir():
     r=np.array(["Gesamtanzahl der Genesenen"])
     for i in np.arange(0,T+0.1,1):
         t=np.append(t,[str(int(i))])
-        e=np.append(e,[str(int((1-methods.epidlös(gamma,beta0,i,s0,i0,0)[0])*N))])
-        r=np.append(r,[str(int(methods.epidlös(gamma,beta0,i,s0,i0,0)[2]*N))])
+        arbeitsergebnis = methods.epidlös(gamma,beta0,i,s0,i0)
+        e=np.append(e,[str(int((1-arbeitsergebnis[0])*N))])
+        r=np.append(r,[str(int((1-arbeitsergebnis[0]-arbeitsergebnis[1])*N))])
     daten=np.vstack((t,e,r))
     daten=daten.T
     np.savetxt("daten.sir.txt",daten,fmt="%20s")
@@ -103,7 +100,7 @@ def PhasenportraitEp():
         while yw>0.000001:
             x = np.append(x,[xw])
             y = np.append(y,[yw])
-            xw,yw, a = methods.epidlös(gamma, beta0, 3,xw,yw,0)
+            xw,yw= methods.epidlös(gamma, beta0, 3,xw,yw)
         
         plot.plot(x,y,'b--')
         if(len(x) != 0 and len(y) != 0):
@@ -143,7 +140,7 @@ def PhasenportraitEnd():
         while yw>0.003:
             x=np.append(x,[xw])
             y=np.append(y,[yw])
-            xw,yw,a=methods.endlös(my,gamma,beta0,2,xw,yw,0)
+            xw,yw =methods.endlös(my,gamma,beta0,2,xw,yw)
         plot.plot(x,y,"b--")
         if len(x)!=0:
             line=plot.plot(x,y,"b--")[0]
@@ -162,11 +159,11 @@ def Verlaufaktuell():
     t=[]
     I=[]
     N=83*(10**6)
-    y=[(N-130)/N,130/N,0]
+    y=[(N-130)/N,130/N]
     for i in range(0,len(inf),1):
         t.append(i)
         I.append(N*(y[1]))
-        y=methods.endlös(1/27375,1/6.5,Kontakt[i],i,y[0],y[1],y[2])
+        y=methods.endlös(1/27375,1/6.5,Kontakt[i],i,y[0],y[1])
 
     plot.plot(t,inf)
     plot.plot(t,I)
@@ -194,13 +191,14 @@ def KontaktrateVerlauf():
     plot.show()
 
 def Prognose():
+    
     N=83*(10**6)
     my=1/27375
     gamma=1/6.5
     datum=122 # Prognose für den 1.7. (122 Tage nach 1.3.)
     beta=0.192 # Kontaktrate vom 27.5.
     s=N-10318-162820 
-    prognose=round(methods.endlös(my,gamma,beta,datum,s/N,10318/N,162820/N)[1]*N)
+    prognose=round(methods.endlös(my,gamma,beta,datum,s/N,10318/N)[1]*N)
     print(prognose)
 
 
@@ -222,13 +220,12 @@ def fehlerBerechnenAbsolut(t):
     gamma = 0
     s0   = -9
     i0    = 10
-    r0 = 0
     x =[]
     i = []
     s = []
     echteWerte = [1-(math.exp(t))/(math.exp(t) -0.9),(math.exp(t))/(math.exp(t) -0.9),0]
     for n in 1000, 2000, 4000, 8000, 16000:
-        approximiert = methods.epidlös(gamma, beta0, t, s0,i0,r0, schritte = n)
+        approximiert = methods.epidlös(gamma, beta0, t, s0,i0, schritte = n)
         x.append(n)
         i.append(abs(approximiert[1]-echteWerte[1]))
         s.append(abs(approximiert[0]-echteWerte[0]))
@@ -259,14 +256,13 @@ def fehlerVergleichloglog(t):
     gamma = 0
     s0   = -9
     i0    = 10
-    r0 = 0
     x =[]
     i = []
     s = []
     f= []
     echteWerte = [1-(math.exp(t))/(math.exp(t) -0.9),(math.exp(t))/(math.exp(t) -0.9),0]
     for n in 1000, 2000, 4000, 8000, 16000:
-        approximiert = methods.epidlös(gamma, beta0, t, s0,i0,r0, schritte = n)
+        approximiert = methods.epidlös(gamma, beta0, t, s0,i0, schritte = n)
         x.append(n)
         i.append(abs(approximiert[1]-echteWerte[1]))
         s.append(abs(approximiert[0]-echteWerte[0]))
@@ -314,31 +310,26 @@ def EpVerlaufMitImpfung(TBeginnImpfung = 6, TEndeImpfung = 80,p = 0.001):
     t=[0]
     s=[s0]
     i=[i0]
-    rec=[0]
     for r in np.arange(0,TBeginnImpfung,1): #Vor der Impfung
         t.append(r)
-        loesung = methods.endlös(0, gamma, beta0, 1, s[len(s)-1],i[len(i)-1],
-                                 rec[len(rec)-1])
+        loesung = methods.endlös(0, gamma, beta0, 1, s[len(s)-1],i[len(i)-1])
         s.append(loesung[0])
         i.append(loesung[1])
-        rec.append(loesung[2])
     maximal = 0 # benötigt zur Betrachtung der Belastungsgrenze des Krankenhauses
     for r in np.arange(TBeginnImpfung,TEndeImpfung,1): #während der Impfperiode
         t.append(r)
         loesung, maximalneu = methods.maximalWert(gamma, beta0, 1, s[len(s)-1],
-                                                  i[len(i)-1],rec[len(rec)-1],p)
+                                                  i[len(i)-1],p)
         if(maximalneu > maximal): maximal = maximalneu
         s.append(loesung[0])
         i.append(loesung[1])
-        rec.append(loesung[2])
     for r in np.arange(TEndeImpfung,TEndeModell,1): # nach der Impfperiode
         t.append(r)
         loesung, maximalneu = methods.maximalWert(gamma, beta0, 1, s[len(s)-1],
-                                                  i[len(i)-1],rec[len(rec)-1],0)
+                                                  i[len(i)-1],0)
         if(maximalneu > maximal): maximal = maximalneu
         s.append(loesung[0])
         i.append(loesung[1])
-        rec.append(loesung[2])
         
     
     plot.plot(t,s,color='b')

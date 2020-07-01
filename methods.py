@@ -110,7 +110,7 @@ def ForwardKutta4(fun, y0, T, n):
 
 
 
-def epidlös(gamma, beta0, t,s_0,i_0,r_0, schritte = 2000, kutta=False):
+def epidlös(gamma, beta0, t,s_0,i_0, schritte = 2000, kutta=False):
     '''
     Lösung des epidemischen Modells unter Benutzung von Euler/RungeKutta \n
     Funktion der Anfälligen s(t) \n
@@ -136,28 +136,28 @@ def epidlös(gamma, beta0, t,s_0,i_0,r_0, schritte = 2000, kutta=False):
     Infizierte i(t) und genesene r(t)
 
     '''
-    y_0=np.array([s_0,i_0,r_0])
+    y_0=np.array([s_0,i_0])
     if t==0:
         return y_0
     else:
         if(kutta==False):
             return ForwardEuler(lambda t,y: 
                                 np.array([(-1)*beta0*y[0]*y[1],
-                                          beta0*y[0]*y[1]-gamma*y[1], gamma * y[1]]),
+                                          beta0*y[0]*y[1]-gamma*y[1]]),
                                          y_0,
                                          t,
                                          schritte)
         else: 
             return ForwardKutta4(lambda t,y: 
                                 np.array([(-1)*beta0*y[0]*y[1],
-                                          beta0*y[0]*y[1]-gamma*y[1], gamma * y[1]]),
+                                          beta0*y[0]*y[1]-gamma*y[1]]),
                                          y_0,
                                          t,
                                          schritte)
     #n gross wählen!!!
             
            
-def endlös(my, gamma, beta0, t, s_0, i_0, r_0, schritte = 2000):
+def endlös(my, gamma, beta0, t, s_0, i_0, schritte = 2000):
     '''
     Lösung des endemischen Modells unter Benutzung von Euler/Rungekutta \n
     Funktion der Anfälligen s(t) \n
@@ -181,14 +181,13 @@ def endlös(my, gamma, beta0, t, s_0, i_0, r_0, schritte = 2000):
     array, enthält normierte Anzahl Anfällige s(t), \n
     Infizierte i(t) und genesene r(t)
 '''
-    y_0 = np.array([s_0,i_0,r_0])
+    y_0 = np.array([s_0,i_0])
     if t==0:
         return y_0
     else:
         return ForwardEuler(lambda t,y: 
                             np.array([my - my* y[0]-beta0*y[0]*y[1],
-                                      (-1) * my * y[1] + beta0*y[0]*y[1]-gamma * y[1],
-                                      (-1) * my*y[2]+ gamma * y[1]]),
+                                      (-1) * my * y[1] + beta0*y[0]*y[1]-gamma * y[1]]),
                                      y_0,
                                      t,
                                      schritte)
@@ -231,7 +230,7 @@ def fehler(t,beta,y):
     N=83*(10**6)
     my=1/27375
     gamma=1/6.5
-    fehler=(endlös(my,gamma,beta,t,y[0],y[1],y[2])[1]*N-inf[t])/inf[t]
+    fehler=(endlös(my,gamma,beta,t,y[0],y[1])[1]*N-inf[t])/inf[t]
     return fehler
 
 def betaapprox(t,beta0,a,y):
@@ -282,7 +281,7 @@ def Kontaktrate(t):
     while time<t+1:
         while (eps<0.05 and time<t+1):
             kontakt=np.append(kontakt,[beta])
-            y=endlös(my,gamma,beta,time,y[0],y[1],y[2])
+            y=endlös(my,gamma,beta,time,y[0],y[1])
             time+=1
             if time<t+1:
                 eps=abs(fehler(time,beta,y))
@@ -334,7 +333,7 @@ def AddArrow(line, position=None, direction='right', size=15, color=None):
         size=size
     )
 
-def maximalWert(gamma, beta0, t, s_0, i_0, r_0, p, schritte = 2000):
+def maximalWert(gamma, beta0, t, s_0, i_0, p, schritte = 2000):
     '''
     Lösung des epidemischen Modells unter Berücksichtung der Impfungsrate p.
     Gibt außerdem max(i) zurück
@@ -362,14 +361,13 @@ def maximalWert(gamma, beta0, t, s_0, i_0, r_0, p, schritte = 2000):
 
     '''
 
-    y_0=np.array([s_0,i_0,r_0])
+    y_0=np.array([s_0,i_0])
     if t==0:
         return y_0
     else:
         return ForwardEulerMitMax(lambda t,y: 
                             np.array([(-1)*beta0*y[0]*y[1] - p,
-                                      beta0*y[0]*y[1]-gamma*y[1], 
-                                      gamma * y[1] +p]),
+                                      beta0*y[0]*y[1]-gamma*y[1]]),
                                      y_0,
                                      t,
                                      schritte)
