@@ -212,7 +212,7 @@ def Prognose():
     27.5. mit der Kontaktrate vom 27.5.
     Returns
     -------
-    int, Infiziertenzahl am 1.7.
+    float, Infiziertenzahl am 1.7.
     '''
     N=83*(10**6)
     my=1/27375
