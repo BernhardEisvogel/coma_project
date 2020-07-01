@@ -10,13 +10,23 @@ import matplotlib.pyplot as plot
 import math
 from scipy.stats import linregress 
 
-def EpVerlauf():
+def EpVerlauf(end = True):
+    """
+    Dieses Programm liest die Datei sirdyn.param und zeichnet für die daraus\n
+    ausgelesenen Werte ein Diagramm mit dem Verlauf der Infizierten und An- \n
+    fälligen Zahl
+    
+    Es wird standardmäßig das epidemologische Modell benutzt. Dies kann aber \n
+    end=False als Eingabewert umgestellt werden.
+    """
     gamma, beta0, my, Tgelesen, s0,i0 = methods.SirDynLesen()
     t=[0]
     s=[s0]
     i=[i0]
     rec=[0] # Dieser Wert wird zwar aktuell nicht benötigt, steht aber da für 
             # zukünftige Überlegungen
+    if(end == False): my = 0
+    
     for r in np.arange(0,Tgelesen+0.1,2):
         t.append(r)
         loesung = methods.endlös(my, gamma, beta0, 2, s[len(s)-1],i[len(i)-1],
@@ -32,7 +42,6 @@ def EpVerlauf():
     plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
     plot.show()
     plot.show()
-
 def DatenSir():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
     N=83*(10**6)
@@ -48,6 +57,15 @@ def DatenSir():
     np.savetxt("daten.sir.txt",daten,fmt="%20s")
 
 def PhasenportraitEp():
+    '''
+    Dieses Programm zeichnet ein Phasenportrait des epidemologischen Epidemie-\n
+    verlauf. Dazu liest es die Daten aus sirdyn.param aus
+
+    Returns
+    -------
+    None.
+
+    '''
     gamma,beta0,T,s0,i0 = methods.SirLesen()
     xstartwerte= []
     ystartwerte = []
@@ -78,6 +96,15 @@ def PhasenportraitEp():
     plot.show
     
 def PhasenportraitEnd():
+    '''
+    Dieses Programm zeichnet ein Phasenportrait des endemischen Epidemie-\n
+    verlauf mit den Daten aus sirdyn.param
+
+    Returns
+    -------
+    None.
+
+    '''
     gamma, beta0, my, T, s0,i0 = methods.SirDynLesen()
     #my=0.00003653
     xstartwerte=[]
@@ -148,9 +175,6 @@ def Prognose():
     Prognose für die Infiziertenzahl am 1.7. ausgehend von \n
     der Infiziertenzahl am 24.6. unter der Annahme einer konstanten \n
     Kontaktrate ab 24.6.
-    Returns
-    -------
-    prognose : integer, prognostizierte Infiziertenzahl am 1.7.
     """
     N=83*(10**6)
     my=1/27375
@@ -320,4 +344,3 @@ def EpVerlaufMitImpfung(TBeginnImpfung = 6, TEndeImpfung = 80,p = 0.001):
     plot.ylabel("Anteil der Anfälligen und Infizierten")
     plot.show()
     plot.show()
-EpVerlaufMitImpfung()
