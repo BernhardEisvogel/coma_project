@@ -10,30 +10,47 @@ import matplotlib.pyplot as plot
 import math
 from scipy.stats import linregress 
 
-def EpVerlauf(end = True):
+def EpVerlauf(epi = True):
     """
     Dieses Programm liest die Datei sirdyn.param und zeichnet für die daraus\n
     ausgelesenen Werte ein Diagramm mit dem Verlauf der Infizierten und An- \n
     fälligen Zahl
     
     Es wird standardmäßig das epidemologische Modell benutzt. Dies kann aber \n
-    end=False als Eingabewert umgestellt werden.
+    mit epi= False als Eingabewert umgestellt werden.
     """
-    gamma, beta0, my, Tgelesen, s0,i0 = methods.SirDynLesen()
+    gamma = 0
+    beta0 =0
+    my =0
+    Tgelesen = 0
+    s0 = 0
+    i0 = 0
     t=[0]
-    s=[s0]
-    i=[i0]
     rec=[0] # Dieser Wert wird zwar aktuell nicht benötigt, steht aber da für 
             # zukünftige Überlegungen
-    if(end == False): my = 0
-    
-    for r in np.arange(0,Tgelesen+0.1,2):
-        t.append(r)
-        loesung = methods.endlös(my, gamma, beta0, 2, s[len(s)-1],i[len(i)-1],
-                                 rec[len(rec)-1])
-        s.append(loesung[0])
-        i.append(loesung[1])
-        rec.append(loesung[2])
+    if(epi == True): 
+        gamma, beta0, Tgelesen, s0,i0 = methods.SirLesen()
+        s=[s0]
+        i=[i0]
+        for r in np.arange(0,Tgelesen+0.1,2):
+            t.append(r)
+            loesung = methods.epidlös(gamma, beta0, 2, s[len(s)-1],i[len(i)-1],
+                                     rec[len(rec)-1])
+            s.append(loesung[0])
+            i.append(loesung[1])
+            rec.append(loesung[2])
+    else:
+        gamma, beta0, my, Tgelesen, s0,i0 = methods.SirDynLesen()
+        s=[s0]
+        i=[i0]
+        for r in np.arange(0,Tgelesen+0.1,2):
+            t.append(r)
+            loesung = methods.endlös(my, gamma, beta0, 2, s[len(s)-1],i[len(i)-1],
+                                     rec[len(rec)-1])
+            s.append(loesung[0])
+            i.append(loesung[1])
+            rec.append(loesung[2])
+            
     plot.plot(t,s)
     plot.plot(t,i)
     plot.title("Zeitlicher Verlauf der Anfälligen und Infizierten")
@@ -42,6 +59,7 @@ def EpVerlauf(end = True):
     plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
     plot.show()
     plot.show()
+
 def DatenSir():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
     N=83*(10**6)
