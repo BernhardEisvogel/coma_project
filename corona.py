@@ -10,6 +10,21 @@ import matplotlib.pyplot as plot
 import math
 from scipy.stats import linregress 
 
+print("             . \n"
+   "      .   :   .  Herzlich Willkommen beim CoMa -\n"+
+   "  '.   .  :  .   .---       Projekt von Louisa und Bernhard !\n"+
+ " ._   '._.-'''-._.'   _._______.-------\n"+
+ "   '-..'         '..-' \n"+
+" --._ /.==.     .==.\ _.------^          Stay  \n"+
+"     ;/_o__\   /_o__\;\n"+
+"-----|`#### ) ( ####`|--------.________  Safe and Healthy !!\n"+
+"    _:     (\_/)     ;_\n"+
+" --'  \   ______     /  '-------\n"+
+"   _.-''. ||||||   .''-._  \n"+
+"  '    .''-.._..-''.     \  '\n"+
+"    .'   '  :  '   '     |. <-- Very angry Virus, because now YOU\n"+
+"                                      can predict it's secret moves !\n"+
+ "       '    :   '")
 def EpVerlauf(epi = True):
     """
     Dieses Programm liest die Datei sirdyn.param und zeichnet für die daraus\n
