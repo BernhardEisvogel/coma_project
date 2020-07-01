@@ -128,7 +128,21 @@ def Verlaufaktuell():
             [ "1.3.20", "31.03.20", "30.04.20", "27.05.20" ] )
     plot.legend(["Tabellendaten", "Errechnete Daten"])
     plot.show()
-
+    
+def KontaktrateVerlauf():
+    x=[]
+    y=[]
+    k=methods.Kontaktrate(87)
+    for i in range(0,88,1):
+        x.append(i)
+        y.append(k[i])
+    plot.plot(x,y)
+    plot.title("Zeitlicher Verlauf der Kontaktrate")
+    plot.xlabel("Datum")
+    plot.ylabel("Kontaktrate")
+    plot.xticks( [0, 30, 60, 87],
+            [ "1.3.20", "31.03.20", "30.04.20", "27.05.20" ] )
+    plot.show()
 
 def Prognose():
     """
