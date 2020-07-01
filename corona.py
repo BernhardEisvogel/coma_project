@@ -194,12 +194,20 @@ def KontaktrateVerlauf():
     plot.show()
 
 def Prognose():
+    '''
+    Die Funktion erstellt eine Prognose für die Infiziertenzahl am 1.7. \n
+    mithilfe des endemischen Modells, ausgehend von der Infiziertenzahl am \n
+    27.5. mit der Kontaktrate vom 27.5.
+    Returns
+    -------
+    int, Infiziertenzahl am 1.7.
+    '''
     N=83*(10**6)
     my=1/27375
     gamma=1/6.5
-    datum=122 # Prognose für den 1.7. (122 Tage nach 1.3.)
-    beta=0.192 # Kontaktrate vom 27.5.
-    s=N-10318-162820 
+    datum=35 # Prognose für den 1.7., 35 Tage nach dem 27.5.
+    beta=methods.Kontaktrate(87)[87] #berechnete Kontaktrate vom 27.5.
+    s=N-10318-162820 #Anzahl der Anfälligen vom 27.5., berechnet aus den Tabellendaten
     prognose=round(methods.endlös(my,gamma,beta,datum,s/N,10318/N,162820/N)[1]*N)
     print(prognose)
 
