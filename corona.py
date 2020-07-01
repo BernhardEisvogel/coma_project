@@ -220,7 +220,7 @@ def Prognose():
     datum=35 # Prognose für den 1.7., 35 Tage nach dem 27.5.
     beta=methods.Kontaktrate(87)[87] #berechnete Kontaktrate vom 27.5.
     s=N-10318-162820 #Anzahl der Anfälligen vom 27.5., berechnet aus den Tabellendaten
-    prognose=round(methods.endlös(my,gamma,beta,datum,s/N,10318/N,162820/N)[1]*N)
+    prognose=round(methods.endlös(my,gamma,beta,datum,s/N,10318/N)[1]*N)
     print(prognose)
 
 
