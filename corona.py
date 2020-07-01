@@ -162,10 +162,11 @@ def Verlaufaktuell():
     t=[]
     I=[]
     N=83*(10**6)
+    y=[(N-130)/N,130/N,0]
     for i in range(0,len(inf),1):
         t.append(i)
-        I.append(N*(methods.endlös(1/27375,1/6.5,Kontakt[i],i,(N-130)/N,
-                                   130/N,0)[1]))
+        I.append(N*(y[1]))
+        y=methods.endlös(1/27375,1/6.5,Kontakt[i],i,y[0],y[1],y[2])
 
     plot.plot(t,inf)
     plot.plot(t,I)
