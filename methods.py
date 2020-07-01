@@ -211,52 +211,50 @@ def TabelleLesen():
         inf[i]=int(inf[i]) 
     return inf
     
-def fehler(t,beta):
+def fehler(t,beta,y):
     """
     Berechnung des Fehler zwischen der errechneten \n
     Infiziertenzahl des endemischen Modells und den Tabellendaten \n
-    zum Zeitpunkt t in Abhängigkeit von der gewählten Kontaktrate 
-
+    zum Zeitpunkt t in Abhängigkeit von der gewählten Kontaktrate und \n
+    den Anfangswerten y
     Parameters
     ----------
     t : integer, Zeitpunkt 
     beta : float, Kontaktrate
-
+    y: list, enthält s0,i0,r0 zur Berechnung der Infiziertenzahl mit endlös()
     Returns
     -------
     fehler : relativer Fehler zwischen Berechnung und tatsächlicher Infiziertenzahl
     (ohne Absolutbetrag)
-
     """
     inf=TabelleLesen()
     N=83*(10**6)
     my=1/27375
     gamma=1/6.5
-    fehler=(endlös(my,gamma,beta,t,(N-130)/N,130/N,0)[1]*N-inf[t])/inf[t]
+    fehler=(endlös(my,gamma,beta,t,y[0],y[1],y[2])[1]*N-inf[t])/inf[t]
     return fehler
 
-def betaapprox(t,beta0,a):
+def betaapprox(t,beta0,a,y):
     """
     Approximation der Kontaktrate für einen Zeitpunkt t \n
     sodass der relative Fehler zwischen berechneter und aktueller \n 
-    Infiziertenzahl kleiner 0.05 ist, bei einem Anfangswert von beta0 
-
+    Infiziertenzahl kleiner 0.05 ist, bei einem Anfangswert von beta0 \n
+    und den Anfangswerten y
     Parameters
     ----------
     t : integer, Zeitpunkt
     beta0 : float, Anfangswert der Approximation der Kontaktrate
-    a : integer, Wert -1 oder 1, Richtung der Approximation von beta0 ausgehend 
-
+    a : integer, Wert -1 oder 1, Richtung der Approximation von beta0 ausgehend
+    y: list, enthält s0,i0,r0 
     Returns
     -------
     beta : float, approximierte Kontaktrate
-
     """
     beta=beta0
-    eps=abs(fehler(t,beta))#relativer Fehler im Betrag beim Anfangswert beta0
+    eps=abs(fehler(t,beta,y))#relativer Fehler im Betrag beim Anfangswert beta0
     while (eps>=0.05 and beta<1):
         beta=round(beta+(a*0.001),4)
-        eps=abs(fehler(t,beta))
+        eps=abs(fehler(t,beta,y))
     #Annäherung von beta, solange bis Fehler kleiner 0.05
     return beta
 
@@ -264,34 +262,36 @@ def Kontaktrate(t):
     """
     stückweise konstante Funktion der Kontaktrate bis zum Zeitpunkt t \n
     unter Verwendung von betaapprox, fehler
-
     Parameters
     ----------
     t : integer, Zeitpunkt
-
     Returns
     -------
     list, Kontaktrate zu den Zeitpunkten 0,1,...,t
-
     """
+    N=83*(10**6)
+    my=1/27375
+    gamma=1/6.5
     time=0
-    beta=betaapprox(1,0,1)
+    beta=betaapprox(1,0,1,[(N-130)/N,130/N,0])
     #approximierte Kontaktrate bei t=1, beta0=0, da bei t=0 keine sinnvolle \n
     #Approximation stattfindet, da der Fehler zum Anfangswert i0 hier immer 0
     eps=0
+    y=[(N-130)/N,130/N,0]
     kontakt=np.array([])
     while time<t+1:
         while (eps<0.05 and time<t+1):
             kontakt=np.append(kontakt,[beta])
+            y=endlös(my,gamma,beta,time,y[0],y[1],y[2])
             time+=1
             if time<t+1:
-                eps=abs(fehler(time,beta))
+                eps=abs(fehler(time,beta,y))
             #Kontaktrate konstant lassen, bis der Fehler größer 0.05 \n
         if time<t+1:
             #Neue Approximation der Kontaktrate falls Fehler größer 0.05
-            a=(-1)*fehler(time,beta)/abs(fehler(time,beta))
-            beta=betaapprox(time,beta,a)
-            eps=abs(fehler(time,beta))
+            a=(-1)*fehler(time,beta,y)/abs(fehler(time,beta,y))
+            beta=betaapprox(time,beta,a,y)
+            eps=abs(fehler(time,beta,y))
     return kontakt[0:(t+1)]
 """
 Created on Thu Jun  4 06:30:03 2020
