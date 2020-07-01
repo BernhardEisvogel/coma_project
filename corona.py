@@ -191,16 +191,6 @@ def KontaktrateVerlauf():
     plot.show()
 
 def Prognose():
-<<<<<<< HEAD
-    
-    N=83*(10**6)
-    my=1/27375
-    gamma=1/6.5
-    datum=122 # Prognose für den 1.7. (122 Tage nach 1.3.)
-    beta=0.192 # Kontaktrate vom 27.5.
-    s=N-10318-162820 
-    prognose=round(methods.endlös(my,gamma,beta,datum,s/N,10318/N)[1]*N)
-=======
     '''
     Die Funktion erstellt eine Prognose für die Infiziertenzahl am 1.7. \n
     mithilfe des endemischen Modells, ausgehend von der Infiziertenzahl am \n
@@ -216,7 +206,6 @@ def Prognose():
     beta=methods.Kontaktrate(87)[87] #berechnete Kontaktrate vom 27.5.
     s=N-10318-162820 #Anzahl der Anfälligen vom 27.5., berechnet aus den Tabellendaten
     prognose=round(methods.endlös(my,gamma,beta,datum,s/N,10318/N,162820/N)[1]*N)
->>>>>>> 64d32f942c6f6e2a57ba7bb2115217efb1b499e0
     print(prognose)
 
 
@@ -293,7 +282,6 @@ def fehlerVergleichloglog(t):
     for r in range(0,len(x)):
         xinlog.append(math.log(x[r]))
             
-    print(linregress(xinlog,i))
     c = pow(math.e, linregress(xinlog,i).intercept) 
     for n in 1000, 2000, 4000, 8000, 16000:
         f.append(c/n)
