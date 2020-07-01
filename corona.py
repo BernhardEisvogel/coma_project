@@ -194,28 +194,14 @@ def KontaktrateVerlauf():
     plot.show()
 
 def Prognose():
-    """
-    Prognose für die Infiziertenzahl am 1.7. ausgehend von \n
-    der Infiziertenzahl am 24.6. unter der Annahme einer konstanten \n
-    Kontaktrate ab 24.6.
-    """
     N=83*(10**6)
     my=1/27375
     gamma=1/6.5
-    beta=0
     datum=122 # Prognose für den 1.7. (122 Tage nach 1.3.)
-    aktdat=115 # Prognose vom 24.6. (115 Tagen nach 1.3.)
-    aktinf=6218 # aktuell Infizierte
-    #Approximation der Kontaktrate vom 24.6. bis Fehler zwischen
-    #berechneter und tatsächlicher Infiziertenzahl am 24.6. kleiner 0.05
-    eps=abs((methods.endlös(my,gamma,beta,aktdat,(N-130)/N,130/N,0)[1]*N-aktinf)/aktinf)
-    while (eps>=0.05 and beta<1):
-        beta=round(beta+0.001,4)#evt kleiner wählen
-        eps=abs((methods.endlös(my,gamma,beta,aktdat,(N-130)/N,
-                                130/N,0)[1]*N-aktinf)/aktinf)
-    #Progonse für 1.7. bei Kontaktrate vom 24.6.
-    prognose=int(methods.endlös(my,gamma,beta,datum,(N-130)/N,130/N,0)[1]*N)
-    return prognose
+    beta=0.192 # Kontaktrate vom 27.5.
+    s=N-10318-162820 
+    prognose=round(methods.endlös(my,gamma,beta,datum,s/N,10318/N,162820/N)[1]*N)
+    print(prognose)
 
 
 def fehlerBerechnenAbsolut(t):
