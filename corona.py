@@ -17,12 +17,14 @@ def EpVerlauf(epi = True):
     fälligen Zahl
     
     Es wird standardmäßig das epidemologische Modell benutzt. Dies kann aber \n
-    mit epi= False als Eingabewert umgestellt werden.
+    mit epi = False als Eingabewert umgestellt werden.
     """
     gamma = 0
     beta0 =0
     my =0
     Tgelesen = 0
+    s=[]
+    i=[]
     s0 = 0
     i0 = 0
     t=[0]
@@ -32,9 +34,9 @@ def EpVerlauf(epi = True):
         gamma, beta0, Tgelesen, s0,i0 = methods.SirLesen()
         s=[s0]
         i=[i0]
-        for r in np.arange(0,Tgelesen+0.1,2):
+        for r in np.arange(1,Tgelesen+0.1,1):
             t.append(r)
-            loesung = methods.epidlös(gamma, beta0, 2, s[len(s)-1],i[len(i)-1],
+            loesung = methods.epidlös(gamma, beta0, 1, s[len(s)-1],i[len(i)-1],
                                      rec[len(rec)-1])
             s.append(loesung[0])
             i.append(loesung[1])
@@ -43,9 +45,9 @@ def EpVerlauf(epi = True):
         gamma, beta0, my, Tgelesen, s0,i0 = methods.SirDynLesen()
         s=[s0]
         i=[i0]
-        for r in np.arange(0,Tgelesen+0.1,2):
+        for r in np.arange(1,Tgelesen+0.1,1):
             t.append(r)
-            loesung = methods.endlös(my, gamma, beta0, 2, s[len(s)-1],i[len(i)-1],
+            loesung = methods.endlös(my, gamma, beta0, 1, s[len(s)-1],i[len(i)-1],
                                      rec[len(rec)-1])
             s.append(loesung[0])
             i.append(loesung[1])
@@ -59,6 +61,8 @@ def EpVerlauf(epi = True):
     plot.legend(["Anfällige s(t)", "Infizierte i(t)"])
     plot.show()
     plot.show()
+    
+EpVerlauf(epi=False)
 
 def DatenSir():
     gamma,beta0,T,s0,i0 = methods.SirLesen()
@@ -77,7 +81,7 @@ def DatenSir():
 def PhasenportraitEp():
     '''
     Dieses Programm zeichnet ein Phasenportrait des epidemologischen Epidemie-\n
-    verlauf. Dazu liest es die Daten aus sirdyn.param aus
+    verlauf. Da
 
     Returns
     -------
